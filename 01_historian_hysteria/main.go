@@ -20,9 +20,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	answer := calculateDiff(list1, list2)
+	diff := calculateDiff(list1, list2)
 
-	fmt.Printf("Answer: %v\n", answer)
+	fmt.Printf("Difference: %v\n", diff)
+	fmt.Printf("Similarity score: %d\n")
 }
 
 func readList(path string) ([]int, []int, error) {
