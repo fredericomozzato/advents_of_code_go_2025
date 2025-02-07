@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const filePath string = "../00_resources/list.txt"
+const filePath string = "./list.txt"
 const totalLines int = 1000
 
 func main() {
