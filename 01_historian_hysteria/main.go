@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const filePath string = "./list.txt"
@@ -20,10 +21,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	diff := calculateDiff(list1, list2)
+	// printSideBySide(list1, list2)
 
-	fmt.Printf("Difference: %v\n", diff)
-	fmt.Printf("Similarity score: %d\n")
+	diff := calculateDiff(list1, list2)
+	similarity := calculateSimilarity(list1, list2)
+
+	fmt.Printf("Difference: %d\n", diff)
+	fmt.Printf("Similarity score: %d\n", similarity)
 }
 
 func readList(path string) ([]int, []int, error) {
@@ -89,4 +93,36 @@ func calculateDiff(list1 []int, list2 []int) int {
 	}
 
 	return answer
+}
+
+func calculateSimilarity(l1 []int, l2 []int) int {
+	var similarity int
+
+	start := time.Now()
+	for _, i := range l1 {
+		var count int
+
+		for _, j := range l2 {
+			if i == j {
+				count++
+			}
+		}
+		similarity += i * count
+	}
+
+	elapsed := time.Since(start)
+	// around 570µs
+	fmt.Println(elapsed)
+
+	return similarity
+}
+
+func printSideBySide(list1 []int, list2 []int) {
+	sort.Ints(list1)
+	sort.Ints(list2)
+
+	for i, n := range list1 {
+		fmt.Printf("%d   %d\n", n, list2[i])
+	}
+
 }
