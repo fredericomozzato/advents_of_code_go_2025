@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const filePath string = "./list.txt"
-const totalLines int = 1000
 
 func main() {
 	list1, list2, err := readList(filePath)
@@ -21,13 +20,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// printSideBySide(list1, list2)
-
 	diff := calculateDiff(list1, list2)
 	similarity := calculateSimilarity(list1, list2)
 
 	fmt.Printf("Difference: %d\n", diff)
-	fmt.Printf("Similarity score: %d\n", similarity)
+	fmt.Printf("Similarity: %d\n", similarity)
 }
 
 func readList(path string) ([]int, []int, error) {
@@ -39,8 +36,8 @@ func readList(path string) ([]int, []int, error) {
 
 	defer file.Close()
 
-	list1 := make([]int, 0, totalLines)
-	list2 := make([]int, 0, totalLines)
+	list1 := make([]int, 0)
+	list2 := make([]int, 0)
 
 	scanner := bufio.NewScanner(file)
 
@@ -98,31 +95,24 @@ func calculateDiff(list1 []int, list2 []int) int {
 func calculateSimilarity(l1 []int, l2 []int) int {
 	var similarity int
 
-	start := time.Now()
-	for _, i := range l1 {
+	for _, n1 := range l1 {
 		var count int
 
-		for _, j := range l2 {
-			if i == j {
-				count++
+		if i, ok := slices.BinarySearch(l2, n1); ok {
+			count++
+
+			for {
+				if l2[i+1] == n1 {
+					count++
+					i++
+				} else {
+					break
+				}
 			}
 		}
-		similarity += i * count
-	}
 
-	elapsed := time.Since(start)
-	// around 570µs
-	fmt.Println(elapsed)
+		similarity += n1 * count
+	}
 
 	return similarity
-}
-
-func printSideBySide(list1 []int, list2 []int) {
-	sort.Ints(list1)
-	sort.Ints(list2)
-
-	for i, n := range list1 {
-		fmt.Printf("%d   %d\n", n, list2[i])
-	}
-
 }
