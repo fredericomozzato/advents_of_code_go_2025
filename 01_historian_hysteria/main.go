@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-const filePath string = "./list.txt"
+const filePath = "./list.txt"
 
 func main() {
 	list1, list2, err := readList(filePath)
