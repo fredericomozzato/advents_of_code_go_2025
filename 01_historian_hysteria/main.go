@@ -31,13 +31,12 @@ func readList(path string) ([]int, []int, error) {
 	file, err := os.Open(path)
 
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("%w\n", err)
 	}
 
 	defer file.Close()
 
-	list1 := make([]int, 0)
-	list2 := make([]int, 0)
+	var list1, list2 []int
 
 	scanner := bufio.NewScanner(file)
 
@@ -46,7 +45,7 @@ func readList(path string) ([]int, []int, error) {
 		n1, n2, err := parseNums(line)
 
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("%w\n", err)
 		}
 
 		list1 = append(list1, n1)
@@ -54,20 +53,27 @@ func readList(path string) ([]int, []int, error) {
 
 	}
 
+	if err := scanner.Err(); err != nil {
+		return nil, nil, fmt.Errorf("%w\n", err)
+	}
+
+	sort.Ints(list1)
+	sort.Ints(list2)
+
 	return list1, list2, nil
 }
 
 func parseNums(line string) (int, int, error) {
-	strings := strings.Split(line, "   ")
+	parts := strings.Fields(line)
 
-	n1, err := strconv.Atoi(strings[0])
+	n1, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("%w", err)
 	}
 
-	n2, err := strconv.Atoi(strings[1])
+	n2, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("%w", err)
 	}
 
 	return n1, n2, nil
@@ -75,9 +81,6 @@ func parseNums(line string) (int, int, error) {
 
 func calculateDiff(list1 []int, list2 []int) int {
 	var answer int
-
-	sort.Ints(list1)
-	sort.Ints(list2)
 
 	for i, n := range list1 {
 		diff := n - list2[i]
@@ -96,22 +99,13 @@ func calculateSimilarity(l1 []int, l2 []int) int {
 	var similarity int
 
 	for _, n1 := range l1 {
-		var count int
+		if i, found := slices.BinarySearch(l2, n1); found {
+			similarity += n1
 
-		if i, ok := slices.BinarySearch(l2, n1); ok {
-			count++
-
-			for {
-				if l2[i+1] == n1 {
-					count++
-					i++
-				} else {
-					break
-				}
+			for j := i + 1; j < len(l2) && l2[j] == n1; j++ {
+				similarity += n1
 			}
 		}
-
-		similarity += n1 * count
 	}
 
 	return similarity
