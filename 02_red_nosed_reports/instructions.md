@@ -48,3 +48,5 @@ rules:
 So, in this example, 2 reports are safe.
 
 Analyze the unusual data from the engineers. How many reports are safe?
+
+# Answer: 716 (wrong answer, too high)
